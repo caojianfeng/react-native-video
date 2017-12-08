@@ -474,11 +474,17 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
 }
 
 - (void)handleLoadedTimeRangesChange {
-  if (_player.rate > 0) {
+  AVPlayerItem *video = [_player currentItem];
+  
+  CMTime playerDuration = [self playerItemDuration];
+  if (CMTIME_IS_INVALID(playerDuration)) {
     return;
   }
   
-  [self sendProgressUpdate];
+  self.onVideoLoadedRangeUpdate(@{
+                                  @"target": self.reactTag,
+                                  @"loadedTimeRanges": [self calculateLoadedRanges],
+                                  });
 }
 
 - (void)attachListeners

@@ -156,6 +156,12 @@ export default class Video extends Component {
     }
   };
 
+  _onVideoLoadedRangeUpdate = (event) => {
+    if (this.props.onVideoLoadedRangeUpdate) {
+      this.props.onVideoLoadedRangeUpdate(event.nativeEvent);
+    }
+  };
+
   render() {
     const resizeMode = this.props.resizeMode;
     const source = resolveAssetSource(this.props.source) || {};
@@ -209,6 +215,7 @@ export default class Video extends Component {
       onPlaybackRateChange: this._onPlaybackRateChange,
       onAudioFocusChanged: this._onAudioFocusChanged,
       onAudioBecomingNoisy: this._onAudioBecomingNoisy,
+      onVideoLoadedRangeUpdate: this._onVideoLoadedRangeUpdate,
     });
 
     if (this.props.poster && this.state.showPoster) {
@@ -301,6 +308,7 @@ Video.propTypes = {
   onPlaybackRateChange: PropTypes.func,
   onAudioFocusChanged: PropTypes.func,
   onAudioBecomingNoisy: PropTypes.func,
+  onVideoLoadedRangeUpdate: PropTypes.func,
 
   /* Required by react-native */
   scaleX: PropTypes.number,
