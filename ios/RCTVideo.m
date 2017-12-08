@@ -10,6 +10,7 @@ static NSString *const playbackBufferEmptyKeyPath = @"playbackBufferEmpty";
 static NSString *const readyForDisplayKeyPath = @"readyForDisplay";
 static NSString *const playbackRate = @"rate";
 static NSString *const timedMetadata = @"timedMetadata";
+static NSString *const loadedTimeRanges = @"loadedTimeRanges";
 
 @implementation RCTVideo
 {
@@ -199,6 +200,7 @@ static NSString *const timedMetadata = @"timedMetadata";
                              @"atTimescale": [NSNumber numberWithInt:currentTime.timescale],
                              @"target": self.reactTag,
                              @"seekableDuration": [self calculateSeekableDuration],
+                             @"loadedTimeRanges": [self calculateLoadedRanges],
                             });
    }
 }
@@ -238,12 +240,26 @@ static NSString *const timedMetadata = @"timedMetadata";
     return [NSNumber numberWithInteger:0];
 }
 
+// array of tuples with type: (startSec, durationSec)
+- (NSArray <NSArray<NSNumber *> *> *)calculateLoadedRanges {
+  AVPlayerItem *video = _player.currentItem;
+  NSMutableArray<NSArray<NSNumber *> *> *ret = [NSMutableArray array];
+  
+  [video.loadedTimeRanges enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+    CMTimeRange timeRange = [obj CMTimeRangeValue];
+    [ret addObject: @[@(CMTimeGetSeconds(timeRange.start)), @(CMTimeGetSeconds(timeRange.duration))]];
+  }];
+  
+  return ret;
+}
+
 - (void)addPlayerItemObservers
 {
   [_playerItem addObserver:self forKeyPath:statusKeyPath options:0 context:nil];
   [_playerItem addObserver:self forKeyPath:playbackBufferEmptyKeyPath options:0 context:nil];
   [_playerItem addObserver:self forKeyPath:playbackLikelyToKeepUpKeyPath options:0 context:nil];
   [_playerItem addObserver:self forKeyPath:timedMetadata options:NSKeyValueObservingOptionNew context:nil];
+  [_playerItem addObserver:self forKeyPath:loadedTimeRanges options:NSKeyValueObservingOptionNew context:nil];
   _playerItemObserversSet = YES;
 }
 
@@ -257,6 +273,7 @@ static NSString *const timedMetadata = @"timedMetadata";
     [_playerItem removeObserver:self forKeyPath:playbackBufferEmptyKeyPath];
     [_playerItem removeObserver:self forKeyPath:playbackLikelyToKeepUpKeyPath];
     [_playerItem removeObserver:self forKeyPath:timedMetadata];
+    [_playerItem removeObserver:self forKeyPath:loadedTimeRanges];
     _playerItemObserversSet = NO;
   }
 }
@@ -428,6 +445,8 @@ static NSString *const timedMetadata = @"timedMetadata";
       }
       _playerBufferEmpty = NO;
       self.onVideoBuffer(@{@"isBuffering": @(NO), @"target": self.reactTag});
+    } else if ([keyPath isEqualToString:loadedTimeRanges]) {
+      [self handleLoadedTimeRangesChange];
     }
    } else if (object == _playerLayer) {
       if([keyPath isEqualToString:readyForDisplayKeyPath] && [change objectForKey:NSKeyValueChangeNewKey]) {
@@ -452,6 +471,14 @@ static NSString *const timedMetadata = @"timedMetadata";
   } else {
       [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
   }
+}
+
+- (void)handleLoadedTimeRangesChange {
+  if (_player.rate > 0) {
+    return;
+  }
+  
+  [self sendProgressUpdate];
 }
 
 - (void)attachListeners
