@@ -481,7 +481,7 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
     return;
   }
   
-  self.onVideoLoadedRangeUpdate(@{
+  self.onLoadedRangeUpdate(@{
                                   @"target": self.reactTag,
                                   @"loadedTimeRanges": [self calculateLoadedRanges],
                                   });

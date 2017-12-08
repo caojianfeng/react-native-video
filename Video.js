@@ -156,9 +156,9 @@ export default class Video extends Component {
     }
   };
 
-  _onVideoLoadedRangeUpdate = (event) => {
-    if (this.props.onVideoLoadedRangeUpdate) {
-      this.props.onVideoLoadedRangeUpdate(event.nativeEvent);
+  _onLoadedRangeUpdate = (event) => {
+    if (this.props.onLoadedRangeUpdate) {
+      this.props.onLoadedRangeUpdate(event.nativeEvent);
     }
   };
 
@@ -215,7 +215,7 @@ export default class Video extends Component {
       onPlaybackRateChange: this._onPlaybackRateChange,
       onAudioFocusChanged: this._onAudioFocusChanged,
       onAudioBecomingNoisy: this._onAudioBecomingNoisy,
-      onVideoLoadedRangeUpdate: this._onVideoLoadedRangeUpdate,
+      onLoadedRangeUpdate: this._onLoadedRangeUpdate,
     });
 
     if (this.props.poster && this.state.showPoster) {
@@ -308,7 +308,7 @@ Video.propTypes = {
   onPlaybackRateChange: PropTypes.func,
   onAudioFocusChanged: PropTypes.func,
   onAudioBecomingNoisy: PropTypes.func,
-  onVideoLoadedRangeUpdate: PropTypes.func,
+  onLoadedRangeUpdate: PropTypes.func,
 
   /* Required by react-native */
   scaleX: PropTypes.number,
