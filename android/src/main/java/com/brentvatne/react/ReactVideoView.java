@@ -6,6 +6,7 @@ import android.graphics.Matrix;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.webkit.CookieManager;
@@ -378,7 +379,10 @@ public class ReactVideoView extends ScalableVideoView implements MediaPlayer.OnP
 
         if (mMediaPlayerValid) {
             // TODO: Implement this.
-            Log.e(ReactVideoViewManager.REACT_CLASS, "Setting playback rate is not yet supported on Android");
+//            Log.e(ReactVideoViewManager.REACT_CLASS, "Setting playback rate is not yet supported on Android");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mMediaPlayer.setPlaybackParams(mMediaPlayer.getPlaybackParams().setSpeed(rate));
+            }
         }
     }
 
@@ -388,7 +392,7 @@ public class ReactVideoView extends ScalableVideoView implements MediaPlayer.OnP
         setPausedModifier(mPaused);
         setMutedModifier(mMuted);
         setProgressUpdateInterval(mProgressUpdateInterval);
-//        setRateModifier(mRate);
+        setRateModifier(mRate);
     }
 
     public void setPlayInBackground(final boolean playInBackground) {
