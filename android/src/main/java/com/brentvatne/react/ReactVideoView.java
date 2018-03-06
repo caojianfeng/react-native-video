@@ -383,6 +383,7 @@ public class ReactVideoView extends ScalableVideoView implements MediaPlayer.OnP
 //            Log.e(ReactVideoViewManager.REACT_CLASS, "Setting playback rate is not yet supported on Android");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 mMediaPlayer.setPlaybackParams(mMediaPlayer.getPlaybackParams().setSpeed(rate));
+                setPausedModifier(mActiveStatePauseStatus);
             }
         }
     }
