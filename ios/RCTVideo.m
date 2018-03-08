@@ -518,6 +518,8 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
     AVPlayerItem *item = [notification object];
     [item seekToTime:kCMTimeZero];
     [self applyModifiers];
+  } else {
+      [self setPaused:true];
   }
 }
 
