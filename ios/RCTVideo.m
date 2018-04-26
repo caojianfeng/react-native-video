@@ -602,7 +602,10 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
         [_player setRate:_rate];
       }
       [_player seekToTime:cmSeekTime toleranceBefore:tolerance toleranceAfter:tolerance completionHandler:^(BOOL finished) {
-        if (!wasPaused) [_player play];
+        if (!wasPaused) {
+            [_player play];
+            [_player setRate:_rate];
+        }
         if(self.onVideoSeek) {
             self.onVideoSeek(@{@"currentTime": [NSNumber numberWithFloat:CMTimeGetSeconds(item.currentTime)],
                                @"seekTime": [NSNumber numberWithFloat:seekTime],
