@@ -597,9 +597,15 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
     BOOL wasPaused = _paused;
 
     if (CMTimeCompare(current, cmSeekTime) != 0) {
-      if (!wasPaused) [_player pause];
+      if (!wasPaused) {
+        [_player pause];
+        [_player setRate:_rate];
+      }
       [_player seekToTime:cmSeekTime toleranceBefore:tolerance toleranceAfter:tolerance completionHandler:^(BOOL finished) {
-        if (!wasPaused) [_player play];
+        if (!wasPaused) {
+            [_player play];
+            [_player setRate:_rate];
+        }
         if(self.onVideoSeek) {
             self.onVideoSeek(@{@"currentTime": [NSNumber numberWithFloat:CMTimeGetSeconds(item.currentTime)],
                                @"seekTime": [NSNumber numberWithFloat:seekTime],
