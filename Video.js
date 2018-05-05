@@ -64,6 +64,12 @@ export default class Video extends Component {
     }
   };
 
+  _onPaused = (event) => {
+    if (this.props.onPaused) {
+      this.props.onPaused(event.nativeEvent);
+    }
+  };
+
   _onSeek = (event) => {
     if (this.state.showPoster) {
       this.setState({showPoster: false});
@@ -162,6 +168,7 @@ export default class Video extends Component {
     }
   };
 
+
   render() {
     const resizeMode = this.props.resizeMode;
     const source = resolveAssetSource(this.props.source) || {};
@@ -200,6 +207,7 @@ export default class Video extends Component {
       onVideoLoadStart: this._onLoadStart,
       onVideoLoad: this._onLoad,
       onVideoError: this._onError,
+      onVideoPaused:this._onPaused,
       onVideoProgress: this._onProgress,
       onVideoSeek: this._onSeek,
       onVideoEnd: this._onEnd,
@@ -261,6 +269,7 @@ Video.propTypes = {
   onVideoBuffer: PropTypes.func,
   onVideoError: PropTypes.func,
   onVideoProgress: PropTypes.func,
+  onVideoPaused: PropTypes.func,
   onVideoSeek: PropTypes.func,
   onVideoEnd: PropTypes.func,
   onTimedMetadata: PropTypes.func,
@@ -295,6 +304,7 @@ Video.propTypes = {
   onLoad: PropTypes.func,
   onBuffer: PropTypes.func,
   onError: PropTypes.func,
+  onPaused:PropTypes.func,
   onProgress: PropTypes.func,
   onSeek: PropTypes.func,
   onEnd: PropTypes.func,

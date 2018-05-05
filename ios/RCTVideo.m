@@ -84,9 +84,41 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
                                              selector:@selector(applicationWillEnterForeground:)
                                                  name:UIApplicationWillEnterForegroundNotification
                                                object:nil];
+      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioSessionChangeObserver:) name:AVAudioSessionRouteChangeNotification object:nil];
   }
 
   return self;
+}
+
+
+- (void)audioSessionChangeObserver:(NSNotification *)notification{
+    NSDictionary* userInfo = notification.userInfo;
+    AVAudioSessionRouteChangeReason audioSessionRouteChangeReason = [userInfo[@"AVAudioSessionRouteChangeReasonKey"] longValue];
+    AVAudioSessionInterruptionType audioSessionInterruptionType   = [userInfo[@"AVAudioSessionInterruptionTypeKey"] longValue];
+    if (audioSessionRouteChangeReason == AVAudioSessionRouteChangeReasonNewDeviceAvailable){
+        if (_player && !_paused) {
+             self.onVideoPaused(@{@"paused":@0});
+            [_player play];
+        }
+    }
+    if (audioSessionInterruptionType == AVAudioSessionInterruptionTypeEnded){
+        if (_player && !_paused) {
+             self.onVideoPaused(@{@"paused":@0});
+            [_player play];
+        }
+    }
+    if (audioSessionRouteChangeReason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable){
+        if (_player) {
+            [_player pause];
+            self.onVideoPaused(@{@"paused":@1});
+        }
+    }
+    if (audioSessionInterruptionType == AVAudioSessionInterruptionTypeBegan){
+        if (_player) {
+            [_player pause];
+            self.onVideoPaused(@{@"paused":@1});
+        }
+    }
 }
 
 - (AVPlayerViewController*)createPlayerViewController:(AVPlayer*)player withPlayerItem:(AVPlayerItem*)playerItem {
