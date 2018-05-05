@@ -39,6 +39,7 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
   float _volume;
   float _rate;
   BOOL _muted;
+    BOOL _interruptionContinuePlay;
   BOOL _paused;
   BOOL _repeat;
   BOOL _playbackStalled;
@@ -97,26 +98,37 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
     AVAudioSessionInterruptionType audioSessionInterruptionType   = [userInfo[@"AVAudioSessionInterruptionTypeKey"] longValue];
     if (audioSessionRouteChangeReason == AVAudioSessionRouteChangeReasonNewDeviceAvailable){
         if (_player && !_paused) {
+             [_player play];
              self.onVideoPaused(@{@"paused":@0});
-            [_player play];
         }
     }
     if (audioSessionInterruptionType == AVAudioSessionInterruptionTypeEnded){
         if (_player && !_paused) {
-             self.onVideoPaused(@{@"paused":@0});
             [_player play];
+             self.onVideoPaused(@{@"paused":@0});
         }
     }
     if (audioSessionRouteChangeReason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable){
-        if (_player) {
-            [_player pause];
-            self.onVideoPaused(@{@"paused":@1});
+        if (_player && !_paused) {
+            if (_interruptionContinuePlay) {
+                [_player play];
+                 self.onVideoPaused(@{@"paused":@0});
+            } else {
+                [_player pause];
+                self.onVideoPaused(@{@"paused":@1});
+            }
+           
         }
     }
     if (audioSessionInterruptionType == AVAudioSessionInterruptionTypeBegan){
-        if (_player) {
-            [_player pause];
-            self.onVideoPaused(@{@"paused":@1});
+        if (_player&& !_paused) {
+            if (_interruptionContinuePlay) {
+                self.onVideoPaused(@{@"paused":@0});
+                [_player play];
+            } else {
+                [_player pause];
+                self.onVideoPaused(@{@"paused":@1});
+            }
         }
     }
 }
@@ -556,6 +568,10 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
 }
 
 #pragma mark - Prop setters
+- (void)setInterruptionContinuePlay:(BOOL)interruptionContinuePlay
+{
+    _interruptionContinuePlay = interruptionContinuePlay;
+}
 
 - (void)setResizeMode:(NSString*)mode
 {
