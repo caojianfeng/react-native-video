@@ -342,6 +342,8 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
   }
 
   _player = [AVPlayer playerWithPlayerItem:_playerItem];
+    // 回音 zl
+    _player.currentItem.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmTimeDomain;
   _player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
 
   [_player addObserver:self forKeyPath:playbackRate options:0 context:nil];
