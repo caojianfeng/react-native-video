@@ -349,14 +349,8 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
   [_player addObserver:self forKeyPath:playbackRate options:0 context:nil];
   _playbackRateObserverRegistered = YES;
 
-  const Float64 progressUpdateIntervalMS = _progressUpdateInterval / 1000;
-  // @see endScrubbing in AVPlayerDemoPlaybackViewController.m of https://developer.apple.com/library/ios/samplecode/AVPlayerDemo/Introduction/Intro.html
-  __weak RCTVideo *weakSelf = self;
-  _timeObserver = [_player addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(progressUpdateIntervalMS, NSEC_PER_SEC)
-                                                        queue:NULL
-                                                   usingBlock:^(CMTime time) { [weakSelf sendProgressUpdate]; }
-                   ];
-
+  [self setupPlayerTimeObserver];
+    
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
     //Perform on next run loop, otherwise onVideoLoadStart is nil
     if(self.onVideoLoadStart) {
@@ -815,6 +809,18 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
 - (void)setProgressUpdateInterval:(float)progressUpdateInterval
 {
   _progressUpdateInterval = progressUpdateInterval;
+  [self removePlayerTimeObserver];
+  [self setupPlayerTimeObserver];
+}
+
+- (void)setupPlayerTimeObserver {
+    const Float64 progressUpdateIntervalMS = _progressUpdateInterval / 1000;
+    // @see endScrubbing in AVPlayerDemoPlaybackViewController.m of https://developer.apple.com/library/ios/samplecode/AVPlayerDemo/Introduction/Intro.html
+    __weak RCTVideo *weakSelf = self;
+    _timeObserver = [_player addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(progressUpdateIntervalMS, NSEC_PER_SEC)
+                                                          queue:NULL
+                                                     usingBlock:^(CMTime time) { [weakSelf sendProgressUpdate]; }
+                     ];
 }
 
 - (void)removePlayerLayer
