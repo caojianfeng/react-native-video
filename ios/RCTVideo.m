@@ -194,6 +194,9 @@ static NSString *const loadedTimeRanges = @"loadedTimeRanges";
 
 - (void)applicationWillResignActive:(NSNotification *)notification
 {
+  if (self.onAppStateChange) {
+    self.onAppStateChange(@{@"state": @"inactive"});
+  }
   if (_playInBackground || _playWhenInactive || _paused) return;
 
   [_player pause];
