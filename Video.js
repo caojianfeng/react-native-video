@@ -168,6 +168,11 @@ export default class Video extends Component {
     }
   };
 
+  _onAppStateChange = (event) => {
+    if (this.props.onAppStateChange) {
+      this.props.onAppStateChange(event.nativeEvent);
+    }
+  }
 
   render() {
     const resizeMode = this.props.resizeMode;
@@ -224,6 +229,7 @@ export default class Video extends Component {
       onAudioFocusChanged: this._onAudioFocusChanged,
       onAudioBecomingNoisy: this._onAudioBecomingNoisy,
       onLoadedRangeUpdate: this._onLoadedRangeUpdate,
+      onAppStateChange: this._onAppStateChange,
     });
 
     if (this.props.poster && this.state.showPoster) {
@@ -321,6 +327,7 @@ Video.propTypes = {
   onAudioFocusChanged: PropTypes.func,
   onAudioBecomingNoisy: PropTypes.func,
   onLoadedRangeUpdate: PropTypes.func,
+  onAppStateChange: PropTypes.func,
 
   /* Required by react-native */
   scaleX: PropTypes.number,
