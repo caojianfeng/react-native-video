@@ -54,6 +54,7 @@ RCT_EXPORT_VIEW_PROPERTY(onPlaybackStalled, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlaybackResume, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPlaybackRateChange, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onLoadedRangeUpdate, RCTBubblingEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onAppStateChange, RCTBubblingEventBlock);
 
 - (NSDictionary *)constantsToExport
 {
@@ -66,3 +67,4 @@ RCT_EXPORT_VIEW_PROPERTY(onLoadedRangeUpdate, RCTBubblingEventBlock);
 }
 
 @end
+
