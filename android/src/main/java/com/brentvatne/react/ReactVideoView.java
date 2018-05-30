@@ -106,6 +106,7 @@ public class ReactVideoView extends ScalableVideoView implements MediaPlayer.OnP
     private float mVolume = 1.0f;
     private float mProgressUpdateInterval = 250.0f;
     private float mRate = 1.0f;
+    private float mActiveRate = 1.0f;
     private boolean mPlayInBackground = false;
     private boolean mActiveStatePauseStatus = false;
     private boolean mActiveStatePauseStatusInitialized = false;
@@ -355,6 +356,10 @@ public class ReactVideoView extends ScalableVideoView implements MediaPlayer.OnP
             if (! mMediaPlayer.isPlaying()) {
                 start();
 
+                if (mRate != mActiveRate) {
+                    setRateModifier(mRate);
+                }
+
                 // Also Start the Progress Update Handler
                 mProgressUpdateHandler.post( mProgressUpdateRunnable);
             }
@@ -387,12 +392,19 @@ public class ReactVideoView extends ScalableVideoView implements MediaPlayer.OnP
     public void setRateModifier(final float rate) {
         mRate = rate;
 
-        if ( mMediaPlayerValid) {
-            // TODO: Implement this.
-//            Log.e(ReactVideoViewManager.REACT_CLASS, "Setting playback rate is not yet supported on Android");
-            if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                mMediaPlayer.setPlaybackParams( mMediaPlayer.getPlaybackParams().setSpeed( rate));
-                setPausedModifier( mActiveStatePauseStatus);
+        if (mMediaPlayerValid) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!mPaused) { // Applying the rate while paused will cause the video to start
+                    String deviceBrand = SystemUtil.getDeviceBrand();
+                    if ("honor".equals(deviceBrand)){
+                        mMediaPlayer.setPlaybackParams(mMediaPlayer.getPlaybackParams().setSpeed(1.0f));
+                    }else {
+                        mMediaPlayer.setPlaybackParams(mMediaPlayer.getPlaybackParams().setSpeed(rate));
+                    }
+                    mActiveRate = rate;
+                }
+            } else {
+                Log.e(ReactVideoViewManager.REACT_CLASS, "Setting playback rate is not yet supported on Android versions below 6.0");
             }
         }
     }
