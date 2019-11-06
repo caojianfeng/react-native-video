@@ -626,7 +626,7 @@ public class ReactVideoView extends ScalableVideoView implements MediaPlayer.OnP
      *
      **/
     private void unregisterHeadSetReceiver(){
-        if (getContext() != null && headSetReceiver == null) {
+        if (getContext() != null && headSetReceiver != null) {
             getContext().unregisterReceiver(headSetReceiver);
         }
     }
